@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: ui-sans-serif, system-ui, sans-serif;
+    /* Giao diện Sáng */
+      --bg-main: #ffffff;
+      --bg-secondary: #f9fafb;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+  }
+    .dark {
+      --bg-main: #000000;
+      --bg-secondary: #121212;
+      --text-main: #ffffff;
+      --text-muted: #a1a1aa;
+      --border-color: #27272a;
+    }
+
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    background-color: var(--bg-main);
+      color: var(--text-main);
+      @apply transition-colors duration-300 antialiased;
+  }
+}
