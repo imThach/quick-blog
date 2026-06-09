@@ -3,6 +3,7 @@ import axios from 'axios';
 // Khởi tạo instance với baseURL từ biến môi trường
 const axiosClient = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
+    withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
     },
