@@ -39,7 +39,9 @@ exports.register = async (userData) => {
     await newUser.save();
 
     const tokens = generateTokens(newUser);
-    return { newUser, tokens };
+    newUser.refreshToken = tokens.refreshToken;
+    await newUser.save();
+    return { user: newUser, tokens };
 };
 
 exports.login = async (credentials) => {
@@ -50,6 +52,8 @@ exports.login = async (credentials) => {
         throwError(401, 'Email hoặc mật khẩu không chính xác');
     }
     const tokens = generateTokens(user);
+    user.refreshToken = tokens.refreshToken;
+    await user.save();
     return { user, tokens };
 };
 
@@ -61,13 +65,24 @@ exports.refreshToken = async (token) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
         const user = await User.findById(decoded.id);
-        if (!user) {
-            throwError(404, 'Người dùng không tồn tại!');
+        // Kiểm tra token có khớp với DB không (chống reuse token cũ)
+        if (!user || user.refreshToken !== token) {
+            throwError(403, 'Refresh Token không hợp lệ hoặc đã bị thu hồi!');
         }
         const tokens = generateTokens(user);
+        user.refreshToken = tokens.refreshToken;
+        await user.save();
         return tokens;
     } catch (error) {
         throwError(403, 'Refresh Token không hợp lệ hoặc đã hết hạn!');
+    }
+};
+
+exports.logout = async (userId) => {
+    const user = await User.findById(userId);
+    if (user) {
+        user.refreshToken = null;
+        await user.save();
     }
 };
 

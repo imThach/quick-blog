@@ -10,16 +10,16 @@ const cookieOptions = {
 //dang ky
 exports.register = async (req, res) => {
     try {
-        const { newUser, tokens } = await authService.register(req.body);
+        const { user, tokens } = await authService.register(req.body);
         res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
         res.status(201).json({
             message: 'Đăng ký tài khoản thành công!',
             accessToken: tokens.accessToken,
             user: {
-                _id: newUser._id,
-                username: newUser.username,
-                email: newUser.email,
-                role: newUser.role
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                role: user.role
             }
         });
     } catch (error) {
@@ -60,8 +60,21 @@ exports.refreshToken = async (req, res) => {
 };
 
 // dang xuat
-exports.logout = (req, res) => {
+exports.logout = async (req, res) => {
     try {
+        const refreshToken = req.cookies.refreshToken;
+
+        if (refreshToken) {
+            const jwt = require('jsonwebtoken');
+            try {
+                // Giải mã refreshToken để lấy id của user và xóa token trong DB
+                const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+                await authService.logout(decoded.id);
+            } catch (err) {
+                // Nếu token đã hết hạn hoặc không hợp lệ, cứ bỏ qua và tiến hành xóa cookie
+            }
+        }
+
         res.clearCookie('refreshToken', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
