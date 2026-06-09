@@ -20,7 +20,7 @@ app.use(morgan('dev'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Cấu hình CORS để Vercel Frontend có thể gọi API mà không bị chặn
 app.use(cors({
-    origin: ['https://blog-app-ivory-sigma.vercel.app', 'http://localhost:5173'],
+    origin: ['https://quick-blog-navy-kappa.vercel.app', 'http://localhost:5173'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
